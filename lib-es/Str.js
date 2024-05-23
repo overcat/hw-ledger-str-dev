@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import BIPPath from "bip32-path";
 import { StellarHashSigningNotEnabledError, StellarDataParsingFailedError, StellarUserRefusedError, StellarDataTooLargeError, } from "./errors";
+export * from "./errors";
 const CLA = 0xe0;
 const P1_FIRST = 0x00;
 const P1_MORE = 0x80;

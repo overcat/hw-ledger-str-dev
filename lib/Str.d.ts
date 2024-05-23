@@ -16,6 +16,7 @@
  *  limitations under the License.
  ********************************************************************************/
 import type Transport from "@ledgerhq/hw-transport";
+export * from "./errors";
 /**
  * Stellar API
  *

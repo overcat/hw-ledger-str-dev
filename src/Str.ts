@@ -22,6 +22,7 @@ import {
   StellarUserRefusedError,
   StellarDataTooLargeError,
 } from "./errors";
+export * from "./errors";
 
 const CLA = 0xe0;
 const P1_FIRST = 0x00;

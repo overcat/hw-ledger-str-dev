@@ -19,35 +19,48 @@ import type Transport from "@ledgerhq/hw-transport";
 /**
  * Stellar API
  *
+ * @param transport a transport for sending commands to a device
+ * @param scrambleKey a scramble key
+ *
  * @example
  * import Str from "@ledgerhq/hw-app-str";
  * const str = new Str(transport)
  */
 export default class Str {
-    transport: Transport;
+    private transport;
     constructor(transport: Transport, scrambleKey?: string);
+    /**
+     * Get Stellar application configuration.
+     *
+     * @returns an object with the application configuration, including the version,
+     *    whether hash signing is enabled, and the maximum data size in bytes that the device can sign.
+     * @example
+     * str.getAppConfiguration().then(o => o.version)
+     */
     getAppConfiguration(): Promise<{
         version: string;
+        hashSigningEnabled: boolean;
+        maxDataSize?: number;
     }>;
     /**
-     * get Stellar public key for a given BIP 32 path.
+     * Get Stellar raw public key for a given BIP 32 path.
+     *
      * @param path a path in BIP 32 format
-     * @option boolValidate optionally enable key pair validation
-     * @option boolDisplay optionally enable or not the display
-     * @return an object with the publicKey (using XLM public key format) and
-     * the raw ed25519 public key.
+     * @param display if true, the device will ask the user to confirm the address on the device, if false, it will return the raw public key directly
+     * @return an object with the raw ed25519 public key.
+     *    If you want to convert it to string, you can use {@link https://stellar.github.io/js-stellar-base/StrKey.html#.encodeEd25519PublicKey StrKey.encodeEd25519PublicKey}
      * @example
-     * str.getPublicKey("44'/148'/0'").then(o => o.publicKey)
+     * str.getPublicKey("44'/148'/0'").then(o => o.rawPublicKey)
      */
-    getPublicKey(path: string, boolValidate?: boolean, boolDisplay?: boolean): Promise<{
-        publicKey: string;
-        raw: Buffer;
+    getPublicKey(path: string, display?: boolean): Promise<{
+        rawPublicKey: Buffer;
     }>;
     /**
-     * sign a Stellar transaction.
+     * Sign a Stellar transaction.
+     *
      * @param path a path in BIP 32 format
-     * @param transaction signature base of the transaction to sign
-     * @return an object with the signature and the status
+     * @param transaction {@link https://stellar.github.io/js-stellar-base/Transaction.html#signatureBase signature base} of the transaction to sign
+     * @return an object with the signature
      * @example
      * str.signTransaction("44'/148'/0'", signatureBase).then(o => o.signature)
      */
@@ -55,9 +68,22 @@ export default class Str {
         signature: Buffer;
     }>;
     /**
-     * sign a Stellar transaction hash.
+     * Sign a Stellar Soroban authorization.
+     *
      * @param path a path in BIP 32 format
-     * @param hash hash of the transaction to sign
+     * @param hashIdPreimage the {@link https://github.com/stellar/stellar-xdr/blob/1a04392432dacc0092caaeae22a600ea1af3c6a5/Stellar-transaction.x#L702-L709 Soroban authorization hashIdPreimage} to sign
+     * @return an object with the signature
+     * @example
+     * str.signSorobanAuthorization("44'/148'/0'", hashIdPreimage).then(o => o.signature)
+     */
+    signSorobanAuthorization(path: string, hashIdPreimage: Buffer): Promise<{
+        signature: Buffer;
+    }>;
+    /**
+     * Sign a hash.
+     *
+     * @param path a path in BIP 32 format
+     * @param hash the hash to sign
      * @return an object with the signature
      * @example
      * str.signHash("44'/148'/0'", hash).then(o => o.signature)
@@ -65,19 +91,6 @@ export default class Str {
     signHash(path: string, hash: Buffer): Promise<{
         signature: Buffer;
     }>;
-    /**
-     * sign a Stellar Soroban Authoration.
-     * @param path a path in BIP 32 format
-     * @param hashIdPreimage hashIdPreimage to sign. (ENVELOPE_TYPE_SOROBAN_AUTHORIZATION)
-     * @return an object with the signature and the status
-     * @example
-     * str.signSorobanAuthoration("44'/148'/0'", hashIdPreimage).then(o => o.signature)
-     */
-    signSorobanAuthoration(path: string, hashIdPreimage: Buffer): Promise<{
-        signature: Buffer;
-    }>;
-    signHash_private(path: string, hash: Buffer): Promise<{
-        signature: Buffer;
-    }>;
+    private sendToDevice;
 }
 //# sourceMappingURL=Str.d.ts.map

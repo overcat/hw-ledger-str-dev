@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import BIPPath from "bip32-path";
 import { StellarHashSigningNotEnabledError, StellarDataParsingFailedError, StellarUserRefusedError, StellarDataTooLargeError, } from "./errors";
-export * from "./errors";
 const CLA = 0xe0;
 const P1_FIRST = 0x00;
 const P1_MORE = 0x80;
@@ -81,12 +80,13 @@ export default class Str {
         return __awaiter(this, void 0, void 0, function* () {
             const pathBuffer = pathToBuffer(path);
             const p2 = display ? P2_CONFIRM : P2_NON_CONFIRM;
-            return yield this.transport
-                .send(CLA, INS_GET_PK, P1_FIRST, p2, pathBuffer)
-                .then(data => ({ rawPublicKey: data.slice(0, -2) }))
-                .catch(e => {
+            try {
+                const data = yield this.transport.send(CLA, INS_GET_PK, P1_FIRST, p2, pathBuffer);
+                return { rawPublicKey: data.slice(0, -2) };
+            }
+            catch (e) {
                 throw remapErrors(e);
-            });
+            }
         });
     }
     /**
@@ -182,7 +182,7 @@ const remapErrors = e => {
 const pathToBuffer = (originalPath) => {
     const path = originalPath
         .split("/")
-        .map(value => (value.endsWith("'") || value.endsWith("h") ? value : value + "'"))
+        .map(value => (value.endsWith("'") || value.endsWith("h") ? value : `${value}'`))
         .join("/");
     const pathNums = BIPPath.fromString(path).toPathArray();
     return serializePath(pathNums);
@@ -195,4 +195,5 @@ const serializePath = (path) => {
     }
     return buf;
 };
+export * from "./errors";
 //# sourceMappingURL=Str.js.map

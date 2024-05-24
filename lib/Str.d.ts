@@ -16,7 +16,6 @@
  *  limitations under the License.
  ********************************************************************************/
 import type Transport from "@ledgerhq/hw-transport";
-export * from "./errors";
 /**
  * Stellar API
  *
@@ -94,4 +93,5 @@ export default class Str {
     }>;
     private sendToDevice;
 }
+export * from "./errors";
 //# sourceMappingURL=Str.d.ts.map
